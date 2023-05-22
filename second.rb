@@ -40,17 +40,6 @@ class GameWindow < Gosu::Window
     super MAP_WIDTH, MAP_HEIGHT, false
     self.caption = "Map Creation"
     @path = nil
-    # 多少条路线
-    @route_number = 0
-
-    # 路线节点
-    @route_path = nil
-
-    #当前的节点
-    @current = nil
-
-    # 当前路线节点的所有的路线
-    @all_path = []
 
     x_cell_count = MAP_WIDTH / CELL_DIM
     y_cell_count = MAP_HEIGHT / CELL_DIM
@@ -70,6 +59,10 @@ class GameWindow < Gosu::Window
       end
       column_index += 1
     end
+
+    # now set up the neighbour links
+    # You need to do this using a while loop with another
+    # nested while loop inside.
 
     # 每一列
     line_index = 0;
@@ -141,10 +134,7 @@ class GameWindow < Gosu::Window
 
   # But you DO need to complete it later for the Maze Search task
   def search(cell_x, cell_y)
-    puts "PATH 开始 #{@path}"
-    puts "程序当前点击 X: #{cell_x} ,Y: #{cell_y}"
-
-    @current = [cell_x, cell_y]
+    puts "X #{cell_x}\t Y #{cell_y}"
 
     dead_end = false
     path_found = false
@@ -156,139 +146,10 @@ class GameWindow < Gosu::Window
       [[cell_x, cell_y]] # We are at the east wall - exit
     else
 
-      # 北
       north_path = nil
-      # 西 左
       west_path = nil
-      # 东 右
       east_path = nil
-      # 南
       south_path = nil
-
-      top_cell = nil
-      bot_cell = nil
-      left_cell = nil
-      right_cell = nil
-
-      currentCell = @columns[cell_x, cell_y]
-
-      if currentCell.north != nil && currentCell.north.vacant == true 
-
-      end
-
-      if cell_y != 0
-        north_path = [cell_x, cell_y - 1]
-      end
-
-      if cell_y < ((MAP_WIDTH / CELL_DIM) - 1)
-        south_path = [cell_x, cell_y + 1]
-      end
-
-      if cell_x != 0
-        west_path = [cell_x - 1, cell_y]
-      end
-
-      if cell_x < ((MAP_WIDTH / CELL_DIM) - 1)
-        east_path = [cell_x + 1, cell_y]
-      end
-
-      # if north_path != nil
-      #   list = @columns[north_path[0]]
-      #   top_cell = list[north_path[1]]
-      #   if top_cell.vacant != false && top_cell.visited == false
-      #     @columns[cell_x][cell_y].visited = true
-      #     puts "上面是可能的"
-      #     @route_number +=1
-      #     @all_path << [north_path[0], north_path[1]]
-      #     # east_path = nil
-      #     # west_path = nil
-      #     # south_path = nil
-      #     # x = north_path[0]
-      #     # y = north_path[1]
-      #     # @path << [x, y]
-      #     # search(x, y)
-      #
-      #   end
-      # end
-      #
-      # if south_path != nil
-      #   list = @columns[south_path[0]]
-      #   bot_cell = list[south_path[1]]
-      #   if bot_cell.vacant != false && bot_cell.visited == false
-      #     @columns[cell_x][cell_y].visited = true
-      #     puts "下面是可能的"
-      #     @route_number +=1
-      #     @all_path << [south_path[0], south_path[1]]
-      #     # north_path = nil
-      #     # east_path = nil
-      #     # west_path = nil
-      #     # x = south_path[0]
-      #     # y = south_path[1]
-      #     # @path << [x, y]
-      #     # search(x, y)
-      #   end
-      #
-      # end
-      #
-      # if west_path != nil
-      #   list = @columns[west_path[0]]
-      #   left_cell = list[west_path[1]]
-      #   # 在路线上
-      #   if left_cell.vacant != false && left_cell.visited == false
-      #     @columns[cell_x][cell_y].visited = true
-      #     puts "左边是可能的"
-      #     @route_number +=1
-      #     @all_path << [west_path[0], west_path[1]]
-      #     # south_path = nil
-      #     # north_path = nil
-      #     # east_path = nil
-      #     # x = west_path[0]
-      #     # y = west_path[1]
-      #     # @path << [x, y]
-      #     # search(x, y)
-      #   end
-      # end
-
-
-      if east_path != nil
-        # 获取第列
-        list = @columns[east_path[0]]
-        # 获取列的第几个
-        right_cell = list[east_path[1]]
-        puts "右坐标的值 #{right_cell.vacant}"
-        if right_cell.vacant != false && right_cell.visited == false
-          # right_cell.visited = true
-          @columns[cell_x][cell_y].visited = true
-          puts "右边是可能的"
-          @route_number +=1
-          # puts "#{right_cell[0]} , #{right_cell[1]}"
-          # @all_path << [right_cell[0], right_cell[1]]
-          # west_path = nil
-          # south_path = nil
-          # north_path = nil
-          # x = east_path[0]
-          # y = east_path[1]
-          # @path << [x, y]
-          # search(x, y)
-        end
-      end
-
-
-      if @route_number > 1
-        @route_path = [cell_x, cell_y]
-        @all_path.each do |i|
-          # x = i.
-        end
-      end
-
-
-
-      puts "上 #{north_path}"
-      puts "下 #{south_path}"
-      puts "左 #{west_path}"
-      puts "右 #{east_path}"
-
-      puts "右 数据类型 #{east_path.class}"
 
       if (ARGV.length > 0) # debug
         puts "Searching. In cell x: " + cell_x.to_s + " y: " + cell_y.to_s
@@ -299,6 +160,7 @@ class GameWindow < Gosu::Window
       # cells such as vacant, visited and on_path.
       # Cells on the outer boundaries will always have a nil on the
       # boundary side
+
 
       # pick one of the possible paths that is not nil (if any):
       if (north_path != nil)
@@ -316,8 +178,7 @@ class GameWindow < Gosu::Window
         if (ARGV.length > 0) # debug
           puts "Added x: " + cell_x.to_s + " y: " + cell_y.to_s
         end
-        # [[cell_x, cell_y]].concat(path)
-        [[cell_x, cell_y]] << path
+        [[cell_x, cell_y]].concat(path)
       else
         if (ARGV.length > 0) # debug
           puts "Dead end x: " + cell_x.to_s + " y: " + cell_y.to_s
@@ -340,22 +201,17 @@ class GameWindow < Gosu::Window
       @columns[cell[0]][cell[1]].vacant = true
     when Gosu::MsRight
       cell = mouse_over_cell(mouse_x, mouse_y)
-      @path = [[cell[0], cell[1]]]
-      search(cell[0], cell[1])
-      puts "PATH : #{@path}"
+      @path = search(cell[0], cell[1])
     end
   end
 
   # This will walk along the path setting the on_path for each cell
   # to true. Then draw checks this and displays them a red colour.
   def walk(path)
-    puts "着色路径 :#{@path}"
     index = path.length
-    puts "INDEX :#{index}"
     count = 0
     while (count < index)
       cell = path[count]
-      puts "当前的 ITEM #{cell}"
       @columns[cell[0]][cell[1]].on_path = true
       count += 1
     end
